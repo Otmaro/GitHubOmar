@@ -1,0 +1,321 @@
+<template>
+    <lightning-card title={subject}>
+        <div slot="actions" class="slds-grid slds-grid_align-end slds-grid_vertical-align-center">
+            <div class="alertas-activas-container">
+                <lightning-icon 
+                    icon-name="utility:warning" 
+                    size="small" 
+                    alternative-text="Alertas activas"
+                    class="alert-icon">
+                </lightning-icon>
+                <span class="alertas-activas-text">Alertas activas: {numeroAlertasActivas}</span>
+            </div>
+            <template lwc:if={isContabilizado}>
+                <span class="slds-badge computado-badge">{label.LABEL_PROCESSSTATUS_COMPUTADO}</span>
+            </template>
+            <lightning-button-icon icon-name="utility:refresh" title="Refresh" onclick={handleCaseRefresh}></lightning-button-icon>
+            <template lwc:if={showCloseButton}>
+                <lightning-button class="slds-m-left_xxx-small" variant="destructive-text" label="Cerrar" onclick={handleCloseCase}></lightning-button>
+            </template>
+        </div>
+        <div>
+            <template lwc:if={showSpinner}>
+                <div>
+                    <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+                </div>
+            </template>
+            <template lwc:else>
+                <div class="slds-m-top_medium slds-m-horizontal_small">
+                    <lightning-layout>
+                        <lightning-layout-item class="slds-p-horizontal_x-small">
+                            <div>
+                                <p class="field-title" title="Número">Número</p>
+                                <p style="font-weight:bold">{caseNumber}</p>
+                            </div>
+                        </lightning-layout-item>
+                        <lightning-layout-item class="slds-p-horizontal_x-small">
+                            <div>
+                                <p class="field-title" title="Tipo">Tipo</p>
+                                <p style="font-weight:bold">{recordTypeName}</p>
+                            </div>
+                        </lightning-layout-item>
+                        <lightning-layout-item class="slds-p-horizontal_x-small">
+                            <div>
+                                <p class="field-title" title="Fase">Fase</p>
+                                <template lwc:if={isClosed}>
+                                    <p style="font-weight:bold;color:red">{status}</p>
+                                </template>
+                                <template lwc:else>
+                                    <p style="font-weight:bold">{status}</p>
+                                </template>
+                            </div>
+                        </lightning-layout-item>
+                        <lightning-layout-item class="slds-p-horizontal_x-small">
+                            <div>
+                                <p class="field-title" title="Subestado">Subestado</p>
+                                <template for:each={processStatus} for:item="subStatusString">
+                                    <p key={subStatusString} class="slds-m-bottom_xxx-small">
+                                        <c-lwc-seg-emp-badge field="processStatus"
+                                                             value={subStatusString}></c-lwc-seg-emp-badge>
+                                    </p>
+                                </template>
+                            </div>
+                        </lightning-layout-item>
+                        <lightning-layout-item class="slds-p-horizontal_x-small">
+                            <div>
+                                <p class="field-title" title="Fecha de creación">Fecha de creación</p>
+                                <p style="font-weight:bold">
+                                    <lightning-formatted-date-time value={createdDate}
+                                                                   year="numeric"
+                                                                   month="numeric" day="numeric"
+                                                                   hour="2-digit"
+                                                                   minute="2-digit"
+                                                                   time-zone-name="short"
+                                                                   hour12={ampm}></lightning-formatted-date-time>
+                                </p>
+                            </div>
+                        </lightning-layout-item>
+                        <template lwc:if={showProposalStatusField}>
+                            <lightning-layout-item class="slds-p-horizontal_x-small">
+                                <div>
+                                    <p class="field-title" title="Estado propuesta">Estado propuesta</p>
+                                    <p>
+                                        <c-lwc-seg-emp-badge field="proposalStatus"
+                                                             value={proposalStatus}></c-lwc-seg-emp-badge>
+                                    </p>
+                                </div>
+                            </lightning-layout-item>
+                        </template>
+                        <template lwc:if={isFormalizacion}>
+                            <lightning-layout-item class="slds-p-horizontal_x-small">
+                                <div>
+                                    <p class="field-title" title="Verificación riesgo">Verif. riesgo</p>
+
+                                    <p>
+                                        <c-lwc-seg-emp-badge field="riskVerificationStatus"
+                                                             value={riskVerificationStatus}></c-lwc-seg-emp-badge>
+                                    </p>
+                                </div>
+                            </lightning-layout-item>
+                        </template>
+                        <template lwc:elseif={isSolicitud}>
+                            <lightning-layout-item class="slds-p-horizontal_x-small">
+                                <div>
+                                    <p class="field-title" title="Aseguradora">Aseguradora</p>
+                                    <p style="font-weight:bold">{aseguradoraName}</p>
+                                </div>
+                            </lightning-layout-item>
+                        </template>
+                        <lightning-layout-item class="slds-p-horizontal_x-small">
+                            <div>
+                                <p class="field-title" title="Fecha límite">Fecha límite</p>
+                                <p style="font-weight:bold">
+                                    <lightning-formatted-date-time value={deadline}
+                                                                   year="numeric"
+                                                                   month="numeric"
+                                                                   day="numeric"></lightning-formatted-date-time>
+                                </p>
+                            </div>
+                        </lightning-layout-item>
+                        <template lwc:if={showCarteraField}>
+                            <lightning-layout-item class="slds-p-horizontal_x-small">
+                                <div>
+                                    <p class="field-title" title="Cartera">Cartera</p>
+                                    <p style="font-weight:bold">{cartera}</p>
+                                </div>
+                            </lightning-layout-item>
+                        </template>
+                        <template lwc:if={showFormalizacionStatus}>
+                            <lightning-layout-item class="slds-p-horizontal_x-small">
+                                <div>
+                                    <p class="field-title" title="Fase formalización">Fase formalización</p>
+                                    <p style="font-weight:bold">{formalizacionStatus}</p>
+                                </div>
+                            </lightning-layout-item>
+                        </template>
+                    </lightning-layout>
+
+                </div>
+                <div slot="footer" class="slds-m-top_x-small slds-align_absolute-center">
+
+                    <template lwc:if={showReopenSolicitudButton}>
+                        <lightning-button variant="destructive"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Reabrir solicitud"
+                                          onclick={handleReopenSolicitud}></lightning-button>
+                    </template>
+                    <template lwc:if={showSetAsPdtGEEButton}>
+                        <lightning-button variant="brand-outline"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Marcar Pdt. GEE"
+                                          onclick={handleSetAsPdtGEE}></lightning-button>
+                    </template>
+                    <template lwc:if={showSetAsPdtClienteButton}>
+                        <lightning-button variant="brand-outline"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Marcar Pdt. Cliente"
+                                          onclick={handleSetAsPdtCliente}></lightning-button>
+                    </template>
+                    <template lwc:if={showSetAsPdtAseguradoraButton}>
+                        <lightning-button variant="brand-outline"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Marcar Pdt. Aseguradora"
+                                          onclick={handleSetAsPdtAseguradora}></lightning-button>
+                    </template>
+                    <template lwc:if={showNotificarPlacementButton}>
+                        <lightning-button variant="brand-outline"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Notificar a placement"
+                                          onclick={handleNotifyPlacement}></lightning-button>
+                    </template>
+                    <template lwc:if={showRemovePdtGEEButton}>
+                        <lightning-button variant="destructive-text"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Desmarcar Pdt. GEE"
+                                          onclick={handleRemovePdtGEE}></lightning-button>
+                    </template>
+                    <template lwc:if={showRemovePdtClienteButton}>
+                        <lightning-button variant="destructive-text"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Desmarcar Pdt. Cliente"
+                                          onclick={handleRemovePdtCliente}></lightning-button>
+                    </template>
+                    <template lwc:if={showRemovePdtAseguradoraButton}>
+                        <lightning-button variant="destructive-text"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Desmarcar Pdt. Aseguradora"
+                                          onclick={handleRemovePdtAseguradora}></lightning-button>
+                    </template>
+                    <template lwc:if={showRevisedButton}>
+                        <lightning-button variant="brand-outline"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Revisada info GEE"
+                                          onclick={handleRevisedInfoGEE}></lightning-button>
+                    </template>
+                    <template lwc:if={showRevisedInfoAseguradoraButton}>
+                        <lightning-button variant="brand-outline"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Revisada info aseguradora"
+                                          onclick={handleRevisedInfoAseguradora}></lightning-button>
+                    </template>
+                    <template lwc:if={showProposalRevisedButton}>
+                        <lightning-button variant="brand-outline"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Revisada propuesta"
+                                          onclick={handleRevisedProposal}></lightning-button>
+                    </template>
+                    <template lwc:if={showQuoteModificationButton}>
+                        <lightning-button variant="brand-outline"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Recotizar/Ajustar"
+                                          onclick={handleQuoteModification}></lightning-button>
+                    </template>
+                    <template lwc:if={showSetAsComputadoButton}>
+                        <lightning-button variant="brand-outline"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Computar manual"
+                                          onclick={handleSetAsComputadoManual}></lightning-button>
+                    </template>
+                    <template lwc:if={showChangeRiskButton}>
+                        <lightning-button variant="brand-outline"
+                                          class="slds-m-top_small slds-m-right_small"
+                                          label="Modificar verif. riesgo"
+                                          onclick={handleChangeRisk}></lightning-button>
+                    </template>
+                    <template lwc:if={showAssignToMeButton}>
+                        <lightning-button variant="Brand"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Asignarme"
+                                          onclick={handleAssignToMe}></lightning-button>
+                    </template>
+                    <template lwc:if={showSetAsVistoButton}>
+                        <lightning-button variant="Brand"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Marcar como visto"
+                                          onclick={handleSetAsVisto}></lightning-button>
+                    </template>
+                    <template lwc:if={showStartStudioButton}>
+                        <lightning-button variant="Brand"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Comenzar estudio"
+                                          onclick={handleStartStudio}></lightning-button>
+                    </template>
+                    <template lwc:if={showStartWorkButton}>
+                        <lightning-button variant="Brand"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Gestionar ahora"
+                                          onclick={handleStartWork}></lightning-button>
+                    </template>
+
+                    <template lwc:if={showStopWorkButton}>
+                        <lightning-button variant="Brand"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Detener gestión"
+                                          onclick={handleStopWork}></lightning-button>
+                    </template>
+                    <template lwc:if={showStopWorkAndPendingButton}>
+                        <lightning-button variant="Brand"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Detener y dejar pendiente"
+                                          onclick={handleStopAndPendingWork}></lightning-button>
+                    </template>
+                    <template lwc:if={showFinishEstudioButton}>
+                        <lightning-button variant="success"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Completar estudio"
+                                          onclick={handleFinishEstudio}></lightning-button>
+                    </template>
+                    <template lwc:if={showCoberturaFinishedButton}>
+                        <lightning-button variant="success"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Solicitud completa"
+                                          onclick={handleCoberturaFinished}></lightning-button>
+                    </template>
+                    <template lwc:if={showPolizaSetForRevisionButton}>
+                        <lightning-button variant="success"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Marcar póliza para revisión"
+                                          onclick={handleSetPolizaForRevision}></lightning-button>
+                    </template>
+                    <template lwc:if={showCoberturaReceivedDocButton}>
+                        <lightning-button variant="success"
+                                          class="slds-m-top_small slds-m-right_small"
+                                          label="Recibida doc"
+                                          onclick={handleCoberturaReceivedDoc}></lightning-button>
+                    </template>
+                    <template lwc:if={showGenerarPresupuestoButton}>
+                        <lightning-button variant="success"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Generar Presupuesto"
+                                          onclick={handleGenerateQuote}></lightning-button>
+                    </template>
+                    <template lwc:if={showSetPolizaAsRevisedByGEEButton}>
+                        <lightning-button variant="success"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Confirmar póliza revisada"
+                                          onclick={handleSetPolizaAsRevisedByGEE}></lightning-button>
+                    </template>
+                    <template lwc:if={showSetAsFormalizadaButton}>
+                        <lightning-button variant="success"
+                                          class="slds-m-top_small slds-m-right_small "
+                                          label="Confirmar formalizada"
+                                          onclick={handleSetAsFormalizado}></lightning-button>
+                    </template>
+<!--                    <template lwc:if={showCreatePolizaButton}>-->
+<!--                        <lightning-button variant="success"-->
+<!--                                          class="slds-m-top_small slds-m-right_small "-->
+<!--                                          label="Preparación terminada"-->
+<!--                                          onclick={handleCreatePoliza}></lightning-button>-->
+<!--                    </template>-->
+                    <!--                        <template lwc:if={}>-->
+                    <!--                            <lightning-button variant="Brand"-->
+                    <!--                                              class="slds-m-top_small slds-m-right_small "-->
+                    <!--                                              label=""-->
+                    <!--                                              onclick={}></lightning-button>-->
+                    <!--                        </template>-->
+
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>

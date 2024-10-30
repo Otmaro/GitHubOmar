@@ -1,0 +1,72 @@
+<template>
+    <lightning-modal-header label={modalLabel}></lightning-modal-header>
+
+    <lightning-modal-body class="slds-is-relative">
+        <div class="slds-p-horizontal_medium">
+            <template lwc:if={showSpinner}>
+                <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+            </template>
+            <div>
+                <lightning-record-edit-form
+                        data-id="closingform"
+                        record-id={caseId}
+                        object-api-name="Case"
+                        onsubmit={handleSubmit}
+                        onsuccess={handleOnSubmitSuccess}
+                        onerror={handleOnSubmitError}
+                >
+                    <lightning-messages></lightning-messages>
+                    <lightning-input-field data-id="Status" class="hiddenField" disabled="true" field-name="Status"
+                                           value={statusValue}>
+                    </lightning-input-field>
+                    <lightning-input-field required field-name="ABA_LIS_Motivo_del_Estado__c" data-id="ABA_LIS_Motivo_del_Estado__c"
+                                           onchange={handleMotivoChange}
+                                           value={motivoValue}>
+
+                    </lightning-input-field>
+                    <lightning-input-field required field-name="ABA_LIS_Situacion__c"
+                                           data-id="ABA_LIS_Situacion__c"
+                                           onchange={handleSituacionChange}
+                                           value={situacionValue}>
+                    </lightning-input-field>
+                    <template lwc:if={showCIA}>
+                        <lightning-input required="true"
+                                         type="text"
+                                         label="Introduzca el nombre de la compañía:"
+                                         maxlength="40"
+                                         message-when-too-long="No debe exceder los 20 caracteres"
+                        onchange={handleCIAChange}>
+
+                        </lightning-input>
+                    </template>
+                    <template lwc:if={showMediacion}>
+                        <lightning-input required="true"
+                                         type="text"
+                                         label="Introduzca la mediación:"
+                                         maxlength="45"
+                                         message-when-too-long="No debe exceder los 30 caracteres"
+                        onchange={handleMediacionChange}>
+
+                        </lightning-input>
+                    </template>
+                    <lightning-textarea name="closingComments"
+                                        required={closingCommentsRequired}
+                                        label="Comentarios de cierre"
+                                        onchange={handleCommentChange}
+                                        max-length="150"
+                    >
+
+                    </lightning-textarea>
+                    <div class="slds-m-top_x-small slds-align_absolute-center">
+                        <lightning-button class="slds-m-right_small" variant="destructive-text" disabled={saveInProcess}
+                                          label="Cancelar" onclick={handleCancel}></lightning-button>
+                        <lightning-button variant="brand" disabled={saveInProcess} label="Guardar"
+                                          type="submit"></lightning-button>
+                    </div>
+
+                </lightning-record-edit-form>
+            </div>
+        </div>
+    </lightning-modal-body>
+
+</template>

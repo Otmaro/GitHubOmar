@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Sales Order Lines (Last 3 Months)</label>
+    <protected>false</protected>
+    <values>
+        <field>Json_Config__c</field>
+        <value xsi:type="xsd:string">{
+	&quot;title&quot;: &quot;Últimos pedidos (12 meses)&quot;,
+	&quot;query&quot;: &quot;Select Id, Name, PendingQuantity__c, DeliveredQuantity__c, OrderedQuantity__c, Position__c, URLProduct__c, ProductName__c, ProductDescription__c, URLLine__c, SalesOrderDate__c  from SalesOrderProduct__c where SalesOrder__r.Account__c = : recordId AND SalesOrder__r.SalesOrderDate__c = LAst_N_Months:12 ORDER BY SalesOrder__r.SalesOrderDate__c DESC&quot;,
+	&quot;iconName&quot;: &quot;standard:case&quot;,
+	&quot;datatableType&quot;: [
+                {&quot;label&quot;: &quot;Línea&quot;,&quot;fieldName&quot;: &quot;URLLine__c&quot;,&quot;type&quot;: &quot;url&quot;,&quot;hideDefaultActions&quot;: &quot;true&quot;,&quot;typeAttributes&quot;: {&quot;label&quot;: {&quot;fieldName&quot;: &quot;Name&quot;},&quot;target&quot;: &quot;_blank&quot;}},
+                {&quot;label&quot;: &quot;Fecha pedido&quot;,&quot;fieldName&quot;: &quot;SalesOrderDate__c&quot;,&quot;type&quot;: &quot;date&quot;},
+                {&quot;label&quot;: &quot;Producto&quot;,&quot;fieldName&quot;: &quot;URLProduct__c&quot;,&quot;type&quot;: &quot;url&quot;,&quot;hideDefaultActions&quot;: &quot;true&quot;,&quot;typeAttributes&quot;: {&quot;label&quot;: {&quot;fieldName&quot;: &quot;ProductName__c&quot;},&quot;target&quot;: &quot;_blank&quot;}},
+                {&quot;label&quot;: &quot;Descripción del producto&quot;,&quot;fieldName&quot;: &quot;ProductDescription__c&quot;,&quot;type&quot;: &quot;text&quot;,&quot;hideDefaultActions&quot;: &quot;true&quot;},
+                {&quot;label&quot;: &quot;Cantidad pedida&quot;,&quot;fieldName&quot;: &quot;OrderedQuantity__c&quot;,&quot;type&quot;: &quot;text&quot;,&quot;hideDefaultActions&quot;: &quot;true&quot;},
+                {&quot;label&quot;: &quot;Cantidad entregada&quot;,&quot;fieldName&quot;: &quot;DeliveredQuantity__c&quot;,&quot;type&quot;: &quot;text&quot;,&quot;hideDefaultActions&quot;: &quot;true&quot;},
+                {&quot;label&quot;: &quot;Cantidad pendiente&quot;,&quot;fieldName&quot;: &quot;PendingQuantity__c&quot;,&quot;type&quot;: &quot;text&quot;,&quot;hideDefaultActions&quot;: &quot;true&quot;}
+	]
+}</value>
+    </values>
+</CustomMetadata>

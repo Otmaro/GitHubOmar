@@ -1,0 +1,210 @@
+<template>
+
+    <template if:true={isLoading}>
+        <lightning-spinner alternative-text="Cargando" size="medium"></lightning-spinner>
+    </template>
+
+    <lightning-tabset class="custom-tabset" variant="scoped" active-tab-value="misCasos" onactive={handleTabChange}>
+        <lightning-tab label="Mis casos" value="misCasos" icon-name="standard:case">
+            <div class="header-bar">
+                <lightning-button-icon icon-name="utility:refresh" alternative-text="Refrescar" onclick={refreshComponent} class="refresh-button"></lightning-button-icon>
+            </div>
+            <div class="main-container">
+                <div class="filter-bar">
+                    <lightning-button-group>
+                        <lightning-button label="Día" onclick={filterByDay} class={dayButtonClass}></lightning-button>
+                        <lightning-button label="Semana actual" onclick={filterByCurrentWeek} class={weekButtonClass}></lightning-button>
+                        <lightning-button label="Mes actual" onclick={filterByCurrentMonth} class={monthButtonClass}></lightning-button>
+                    </lightning-button-group>
+                </div>
+
+                <div class="counters-container">
+                    <!-- Contadores de la pestaña "Mis casos" -->
+                    <div class="counter-container">
+                        <div class="header">Casos</div>
+                        <div class="total-counter">
+                            <div class="count" onclick={handleTotalCasesClick}>{totalCases}</div>
+                        </div>
+                        <div class="subcounters scrollable">
+                            <div class="subcounter-item" data-record-type="Orden_de_trabajo_Seguros_de_Empresa" onclick={handleRecordTypeFilter}>
+                                <lightning-icon icon-name="standard:incident" size="small" class="icon"></lightning-icon>
+                                <div class="label">Siniestros</div>
+                                <div class="count">{recordTypeCounts.Orden_de_trabajo_Seguros_de_Empresa}</div>
+                            </div>
+                            <div class="subcounter-item" data-record-type="Gestion_de_placement" onclick={handleRecordTypeFilter}>
+                                <lightning-icon icon-name="standard:work_order" size="small" class="icon"></lightning-icon>
+                                <div class="label">Nuevo Negocio</div>
+                                <div class="count">{recordTypeCounts.Gestion_de_placement}</div>
+                            </div>
+                            <div class="subcounter-item" data-record-type="Cartera" onclick={handleRecordTypeFilter}>
+                                <lightning-icon icon-name="standard:report" size="small" class="icon"></lightning-icon>
+                                <div class="label">Cartera</div>
+                                <div class="count">{recordTypeCounts.Cartera}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contador de Alertas -->
+                    <div class="counter-container">
+                        <div class="header">Alertas</div>
+                        <div class="total-counter">
+                            <div class="count" onclick={handleTotalAlertsClick}>{totalAlerts}</div>
+                        </div>
+                        <div class="subcounters">
+                            <template for:each={alertCountsList} for:item="alert">
+                                <div key={alert.name} class="subcounter-item" data-alert-type={alert.name} onclick={handleAlertTypeFilter}>
+                                    <lightning-icon icon-name="standard:announcement" size="small" class="icon"></lightning-icon>
+                                    <div class="label">{alert.name}</div>
+                                    <div class="count">{alert.count}</div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Contador de Casos Pendientes (con Scope) -->
+                    <div class="counter-container">
+                        <div class="header">Casos Pendientes de mi</div>
+                        <div class="total-counter">
+                            <div class="count" onclick={handleTotalScopeCasesClick}>{totalScopeCases}</div>
+                        </div>
+                        <div class="subcounters">
+                            <div class="subcounter-item" data-record-type="Orden_de_trabajo_Seguros_de_Empresa" onclick={handleRecordTypeFilter}>
+                                <lightning-icon icon-name="standard:incident" size="small" class="icon"></lightning-icon>
+                                <div class="label">Siniestros</div>
+                                <div class="count">{scopeRecordTypeCounts.Orden_de_trabajo_Seguros_de_Empresa}</div>
+                            </div>
+                            <div class="subcounter-item" data-record-type="Gestion_de_placement" onclick={handleRecordTypeFilter}>
+                                <lightning-icon icon-name="standard:work_order" size="small" class="icon"></lightning-icon>
+                                <div class="label">Nuevo Negocio</div>
+                                <div class="count">{scopeRecordTypeCounts.Gestion_de_placement}</div>
+                            </div>
+                            <div class="subcounter-item" data-record-type="Cartera" onclick={handleRecordTypeFilter}>
+                                <lightning-icon icon-name="standard:report" size="small" class="icon"></lightning-icon>
+                                <div class="label">Cartera</div>
+                                <div class="count">{scopeRecordTypeCounts.Cartera}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contador de Casos por Estado del Proceso -->
+                    <div class="counter-container">
+                        <div class="header">Casos Pdt. aseguradora</div>
+                        <div class="total-counter">
+                            <div class="count" onclick={handleTotalProcessStatusCasesClick}>{totalProcessStatusCases}</div>
+                        </div>
+                        <div class="subcounters">
+                            <div class="subcounter-item" data-record-type="Orden_de_trabajo_Seguros_de_Empresa" onclick={handleProcessStatusRecordTypeFilter}>
+                                <lightning-icon icon-name="standard:incident" size="small" class="icon"></lightning-icon>
+                                <div class="label">Siniestros</div>
+                                <div class="count">{processStatusRecordTypeCounts.Orden_de_trabajo_Seguros_de_Empresa}</div>
+                            </div>
+                            <div class="subcounter-item" data-record-type="Gestion_de_placement" onclick={handleProcessStatusRecordTypeFilter}>
+                                <lightning-icon icon-name="standard:work_order" size="small" class="icon"></lightning-icon>
+                                <div class="label">Nuevo Negocio</div>
+                                <div class="count">{processStatusRecordTypeCounts.Gestion_de_placement}</div>
+                            </div>
+                            <div class="subcounter-item" data-record-type="Cartera" onclick={handleProcessStatusRecordTypeFilter}>
+                                <lightning-icon icon-name="standard:report" size="small" class="icon"></lightning-icon>
+                                <div class="label">Cartera</div>
+                                <div class="count">{processStatusRecordTypeCounts.Cartera}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contador de Formalización de Seguros -->
+                    <div class="counter-container formalization">
+                        <div class="header">Ordenes de Emisión Nuevas</div>
+                        <div class="total-counter formalization">
+                            <div class="count formalization" onclick={handleFormalizacionNuevoNegocioClick}>{formalizacionSegurosCount}</div>
+                        </div>
+                    </div>
+
+                    <div class="counter-container formalization">
+                        <div class="header">Formalización Seguros Todos</div>
+                        <div class="total-counter formalization">
+                            <div class="count formalization" onclick={handleAllFormalizacionSegurosClick}>{allFormalizacionSegurosCount}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de datos -->
+            <template if:true={data}>
+                <lightning-datatable
+                    key-field="Id"
+                    data={data}
+                    columns={columns}
+                    hide-checkbox-column="true"
+                    onrowaction={handleRowAction}
+                    class="slds-box slds-theme_default custom-datatable">
+                </lightning-datatable>
+            </template>
+        </lightning-tab>
+
+        <!-- Pestaña "Mi grupo" -->
+        <lightning-tab label="Mi grupo" value="miGrupo" icon-name="utility:groups">
+            <div class="header-bar">
+                <lightning-button-icon icon-name="utility:refresh" alternative-text="Refrescar" onclick={refreshComponent} class="refresh-button"></lightning-button-icon>
+            </div>
+            <div class="main-container">
+                <div class="filter-bar">
+                    <lightning-button-group>
+                        <lightning-button label="Día" onclick={filterByDay} class={dayButtonClass}></lightning-button>
+                        <lightning-button label="Semana actual" onclick={filterByCurrentWeek} class={weekButtonClass}></lightning-button>
+                        <lightning-button label="Mes actual" onclick={filterByCurrentMonth} class={monthButtonClass}></lightning-button>
+                    </lightning-button-group>
+                </div>
+
+                <div class="counters-container">
+                    <div class="counter-container formalization">
+                        <div class="header">Ordenes de emisión <br> (Mis Ramos)</div>
+                        <div class="total-counter formalization">
+                            <div class="count formalization" onclick={handleFormalizacionNuevoNegocioByRamosClick}>{formalizacionNuevoNegocioCountByRamos}</div>
+                        </div>
+                    </div>
+
+                    <div class="counter-container formalization">
+                        <div class="header">Ordenes de emisión <br> (Todos)</div>
+                        <div class="total-counter formalization">
+                            <div class="count formalization" onclick={handleFormalizacionNuevoNegocioAllRamosClick}>{formalizacionNuevoNegocioCountAllRamos}</div>
+                        </div>
+                    </div>
+
+                    <div class="counter-container">
+                        <div class="header">Casos Mis Ramos</div>
+                        <div class="total-counter">
+                            <div class="count" onclick={handleTotalDuplicatedCasesClick}>{totalDuplicatedCases}</div>
+                        </div>
+                        <div class="subcounters subcounters-ramo">
+                            <template for:each={ramoData} for:item="ramo">
+                                <div key={ramo.name} class="subcounter-item" data-record-type={ramo.name} onclick={handleDuplicatedRecordTypeFilter}>
+                                    <lightning-icon icon-name="standard:collection" size="small" class="icon"></lightning-icon>
+                                    <div class="label">{ramo.name}</div>
+                                    <div class="count">{ramo.count}</div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de datos -->
+            <template if:true={data}>
+                <lightning-datatable
+                    key-field="Id"
+                    data={data}
+                    columns={columns}
+                    hide-checkbox-column="true"
+                    onrowaction={handleRowAction}
+                    class="slds-box slds-theme_default custom-datatable">
+                </lightning-datatable>
+            </template>
+        </lightning-tab>
+
+        <template if:true={canViewMisGestiones}>
+            <lightning-tab label="Mis gestiones" value="misGestiones" icon-name="standard:lead">
+                <c-mis-gestiones></c-mis-gestiones>
+            </lightning-tab>
+        </template>
+    </lightning-tabset>
+</template>

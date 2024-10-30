@@ -1,0 +1,152 @@
+<template>
+    <lightning-modal-header label={modalLabel}></lightning-modal-header>
+
+    <lightning-modal-body class="slds-is-relative">
+        <div class="slds-p-left_medium">
+            <template lwc:if={showSpinner}>
+                <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+            </template>
+            <template lwc:if={showIsInfoOkQuestion}>
+                <lightning-radio-group name="radioGroupResult"
+                                       label="Resultado de la revisión"
+                                       options={reviewOptions}
+                                       value={reviewResultValue}
+                                       required
+                                       onchange={handleReviewResultChange}
+                                       type="radio"></lightning-radio-group>
+                <template lwc:if={showCheckIfProposalMade}>
+                    <lightning-radio-group name="proposalReceivedGroup"
+                                           label="¿Se ha recibido una propuesta?"
+                                           options={yesOrNoOptions}
+                                           value={proposalReceivedValue}
+                                           required
+                                           onchange={handleProposalReceivedChange}
+                                           type="radio"></lightning-radio-group>
+                </template>
+            </template>
+            <template lwc:elseif={isRevisedProposal}>
+                <lightning-radio-group name="proposalReceivedGroup"
+                                       label="¿La propuesta es válida?"
+                                       options={yesOrNoOptions}
+                                       value={proposalStatusValue}
+                                       required
+                                       onchange={handleProposalStatusChange}
+                                       type="radio"></lightning-radio-group>
+            </template>
+            <template lwc:elseif={isQuoteGeneration}>
+                <lightning-input required type="date" name="fechaefecto" label="Fecha de efecto" value={fechaEfecto}
+                                 min={today} onchange={handleFechaEfectoChange}></lightning-input>
+                <lightning-input required type="date" name="fechavencimiento" label="Fecha de vencimiento"
+                                 value={fechaVencimiento} min={today}
+                                 onchange={handleFechaVencimientoChange}></lightning-input>
+                <!--                <lightning-input type="number" name="tasa" label="Tasa" value={tasa} step=".01" formatter="percent-fixed" field-level-help="Valor porcentual."></lightning-input>-->
+                <lightning-input type="number" label="Tasa" value={tasa} step=".01" formatter="percent-fixed"
+                                 onchange={handleTasaChange}></lightning-input>
+                <lightning-input type="number" label="Impuesto" value={impuesto} step=".01" formatter="currency"
+                                 onchange={handleImpuestoChange}></lightning-input>
+                <lightning-input required data-id="primaneta" name="primaneta" type="number" label="Prima neta"
+                                 value={primaNeta} formatter="currency" onchange={handlePrimaNetaChange}
+                                 onblur={handleOnblur}></lightning-input>
+                <lightning-input required data-id="importeprimatotal" name="importeprimatotal" type="number"
+                                 label="Importe prima total" value={importePrimaTotal} step=".01" formatter="currency"
+                                 onchange={handleImportePrimaTotalChange} onblur={handleOnblur}></lightning-input>
+                <lightning-textarea label="Comentario" maxlength="10000"
+                                    onchange={handleCommentChange}></lightning-textarea>
+            </template>
+            <template lwc:elseif={isNotifyPlacement}>
+                <lightning-radio-group name="notifyPlacementGroup"
+                                       label="¿Qué desea notificar al equipo de placement?"
+                                       options={notifyPlacementOptions}
+                                       value={notifyPlacementValue}
+                                       required
+                                       onchange={handleNotifyPlacementChange}
+                                       type="radio"></lightning-radio-group>
+                <template lwc:if={showPresupuestosList}>
+                    <lightning-radio-group
+                            name="presupuesto"
+                            label="Seleccione el presupuesto aceptado"
+                            value={presupuestoSelectedIdValue}
+                            required
+                            options={presupuestosPresentadosOptions}
+                            onchange={handlePresupuestoSelectedForAcceptionValueChange}
+                            type="radio"></lightning-radio-group>
+                </template>
+                <template lwc:if={showCreatePoliza}>
+                    <div class="poliza-form">
+
+                    <lightning-record-edit-form
+                            data-id="polizaform"
+                            object-api-name="ABA_Poliza__c"
+                            record-type-id={polizaRecordTypeId}
+
+                    >
+                        <p style="font-weight:bold">Por favor, rellene los siguientes datos.</p>
+                        <lightning-messages></lightning-messages>
+                        <lightning-input-field data-id="ABA_TXT_Oficina_asociada__c" required
+                                               field-name="ABA_TXT_Oficina_asociada__c"
+                                               value={oficinaGestora}></lightning-input-field>
+                        <lightning-input-field data-id="ABA_Fecha_primer_efecto__c"
+                                               field-name="ABA_Fecha_primer_efecto__c"></lightning-input-field>
+                        <lightning-input-field data-id="ABA_LIS_Periodicidad_cobro__c" required
+                                               field-name="ABA_LIS_Periodicidad_cobro__c"
+                                               onchange={handlePeriodicidadChange}></lightning-input-field>
+                        <template lwc:if={showFormaCobro}>
+                            <lightning-input-field data-id="Forma_de_pago__c" required
+                                                   field-name="Forma_de_pago__c"></lightning-input-field>
+                        </template>
+                        <lightning-input-field required data-id="N_de_cuenta__c" field-name="N_de_cuenta__c"></lightning-input-field>
+                        <lightning-input-field data-id="ABA_TXT_Tipo_riesgo__c" required
+                                               field-name="ABA_TXT_Tipo_riesgo__c"></lightning-input-field>
+                        <lightning-input-field data-id="ABA_TXT_Descripci_n_riesgo__c"
+                                               field-name="ABA_TXT_Descripci_n_riesgo__c"></lightning-input-field>
+                        <!--                    TODO: tiene sentido que se traiga de la opp? deberían ser siempre iguales caso y opp?-->
+                        <lightning-input-field data-id="ABA_DT_Fecha_de_emisi_n__c" required
+                                               field-name="ABA_DT_Fecha_de_emisi_n__c"
+                                               value={fechaEfectoFromOpportunity}></lightning-input-field>
+                        <lightning-input-field data-id="ABA_TXT_Prestamo__c"
+                                               field-name="ABA_TXT_Prestamo__c"></lightning-input-field>
+                        <lightning-input-field data-id="ABA_TXT_Entidad_Beneficiaria__c"
+                                               field-name="ABA_TXT_Entidad_Beneficiaria__c"></lightning-input-field>
+
+                    </lightning-record-edit-form>
+
+                    </div></template>
+
+            </template>
+            <template lwc:elseif={isQuoteModification}>
+                <lightning-radio-group name="quoteModificationGroup"
+                                       label="¿Qué cambios desea aplicar?"
+                                       options={quoteModificationOptions}
+                                       value={quoteModificationTypeValue}
+                                       required
+                                       onchange={handleQuoteModificationChange}
+                                       type="radio"></lightning-radio-group>
+            </template>
+            <template lwc:elseif={isChangeRisk} >
+                <lightning-record-edit-form data-id="changeriskform" record-id={caseId} object-api-name="Case"
+                onsuccess={handleOnSubmitSuccess} onerror={handleOnSubmitError}>
+                    <lightning-messages></lightning-messages>
+                    <lightning-input-field required field-name="RiskVerificationStatus__c"></lightning-input-field>
+                </lightning-record-edit-form>
+            </template>
+            <template lwc:elseif={isCoberturaFinished}>
+                <lightning-radio-group name="coberturaAceptadaGroup"
+                                       label="¿Ha recibido la documentación?"
+                                       options={yesOrNoOptions}
+                                       value={coberturaFinishedDocReceivedValue}
+                                       required
+                                       onchange={handleCoberturaFinishedChange}
+                                       type="radio"></lightning-radio-group>
+            </template>
+        </div>
+    </lightning-modal-body>
+    <lightning-modal-footer>
+        <div class="slds-m-top_x-small slds-align_absolute-center">
+            <lightning-button class="slds-m-right_small" variant="destructive-text" disabled={saveInProcess}
+                              label="Cancelar" onclick={handleCancel}></lightning-button>
+            <lightning-button variant="brand" disabled={saveInProcess} label="Guardar"
+                              onclick={handleSave}></lightning-button>
+        </div>
+    </lightning-modal-footer>
+
+</template>

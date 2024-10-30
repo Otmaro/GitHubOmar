@@ -1,0 +1,350 @@
+<!-- Lwc Childs Info Grouped -->
+<template>
+    <lightning-card variant="Narrow" title={label} icon-name="standard:case_wrap_up">
+        <template lwc:if={hasChildCases}>
+            <lightning-button-icon icon-name="utility:expand_all" title="Expand all" onclick={handleExpandAll}
+                                   slot="actions"></lightning-button-icon>
+            <lightning-button-icon icon-name="utility:collapse_all" title="Collapse all"
+                                   onclick={handleCollapseAll} slot="actions"></lightning-button-icon>
+        </template>
+        <lightning-button-icon icon-name="utility:refresh" title="Refresh" onclick={handleRefresh}
+                               slot="actions"></lightning-button-icon>
+        <div>
+            <template lwc:if={showSpinner}>
+                <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+            </template>
+            <template lwc:elseif={hasNotChildCases}>
+                <div class="slds-p-left_medium">
+                    <p>Sin solicitudes</p>
+                </div>
+            </template>
+            <template lwc:else>
+                <template for:each={data} for:item="caseItem">
+                    <lightning-card variant="Narrow" key={caseItem.childCase.Id} icon-name="standard:case"
+                                    class="header-with-no-padding">
+                        <h1 slot="title" class="no-wrap" style="font-size: 12px;">
+                            {caseItem.title}</h1>
+                        <lightning-button-icon data-id={caseItem.childCase.Id} icon-name="utility:open" title="Open"
+                                               onclick={handleOpen}
+                                               slot="actions"></lightning-button-icon>
+                        <lightning-button-icon data-id={caseItem.childCase.Id} icon-name="utility:expand_all"
+                                               title="Expand" onclick={handleSingleExpand}
+                                               slot="actions"></lightning-button-icon>
+                        <lightning-button-icon data-id={caseItem.childCase.Id} icon-name="utility:collapse_all"
+                                               title="Collapse"
+                                               onclick={handleSingleCollapse} slot="actions"></lightning-button-icon>
+                        <div>
+                            <lightning-layout class="slds-m-left_large slds-m-right_medium slds-m-bottom_small">
+                                <lightning-layout-item>
+                                    <div>
+                                        <p title="Fase">Fase</p>
+                                        <p style="font-weight:bold">{caseItem.childCase.Status}</p>
+                                    </div>
+                                </lightning-layout-item>
+                                <lightning-layout-item class="slds-m-left_small">
+                                    <div>
+                                        <p title="Subestado">Subestado</p>
+                                        <template for:each={caseItem.lChildCaseProcessStatus}
+                                                  for:item="subStatusString">
+                                            <p key={subStatusString} class="slds-m-bottom_xxx-small">
+                                                <c-lwc-seg-emp-badge field="processStatus"
+                                                                     value={subStatusString}></c-lwc-seg-emp-badge>
+                                            </p>
+                                        </template>
+                                    </div>
+                                </lightning-layout-item>
+                                <template lwc:if={caseItem.isFormalizacion}>
+                                    <lightning-layout-item class="slds-m-left_small">
+                                        <div>
+                                            <p title="Verificación riesgo">Verif. riesgo</p>
+
+                                            <p>
+                                                <c-lwc-seg-emp-badge field="riskVerificationStatus"
+                                                                     value={caseItem.childCase.RiskVerificationStatus__c}></c-lwc-seg-emp-badge>
+                                            </p>
+                                        </div>
+                                    </lightning-layout-item>
+                                </template>
+                                <template lwc:else>
+                                    <lightning-layout-item class="slds-m-left_small">
+                                        <div>
+
+                                            <p title="Aseguradora">Aseguradora</p>
+                                            <p style="font-weight:bold">{caseItem.childCase.ABA_Aseguradora__r.Name}</p>
+<!--                                        </div>-->
+<!--                                    </lightning-layout-item>-->
+<!--                                    <lightning-layout-item class="slds-m-left_small">-->
+<!--                                        <div>-->
+                                            <p  class="slds-m-top_xx-small" title="Estado propuesta">Estado propuesta</p>
+                                            <p>
+                                                <c-lwc-seg-emp-badge field="proposalStatus"
+                                                                     value={caseItem.childCase.ProposalStatus__c}></c-lwc-seg-emp-badge>
+                                            </p>
+                                        </div>
+                                    </lightning-layout-item>
+                                    <template lwc:if={caseItem.activePresupuesto}>
+                                        <lightning-layout-item class="slds-m-left_small">
+                                            <div>
+                                                <p title="Prima Neta">Prima Neta</p>
+                                                <p style="font-weight:bold; color:green; display: flex; justify-content: flex-end">
+                                                    {caseItem.activePresupuesto.ABA_DIV_Prima_Neta__c} €</p>
+                                                <p  class="slds-m-top_xx-small" title="Prima total">Prima total</p>
+                                                <p style="font-weight:bold; color:green; display: flex; justify-content: flex-end" >
+                                                    {caseItem.activePresupuesto.ABA_DIV_Importe_Total_prima__c} €</p>
+                                            </div>
+                                        </lightning-layout-item>
+                                    </template>
+                                </template>
+                            </lightning-layout>
+
+                        </div>
+
+                        <lightning-accordion allow-multiple-sections-open
+                                             active-section-name={caseItem.activeHighSection}
+                                             class="slds-m-left_small ">
+                            <lightning-accordion-section name="RelatedData" label="Related data">
+                                <lightning-accordion allow-multiple-sections-open
+                                                     active-section-name={caseItem.activeSections}
+                                                     class="slds-m-left_x-small accordion-section-with-no-padding"
+                                >
+                                    <lightning-accordion-section name="Emails" label="Emails"
+                                                                 class="accordion-section-with-no-padding">
+                                        <template for:each={caseItem.lEmailMessages} for:item="email">
+                                            <div data-id={email.Id} key={email.Id} class="slds-p-vertical_x-small">
+                                                <div class="slds-grid">
+                                                    <div class="slds-col slds-grow-none">
+                                                        <lightning-icon icon-name="standard:email"
+                                                                        size="small"></lightning-icon>
+                                                    </div>
+                                                    <div class="slds-col">
+                                                        <p><span style="color:blue">{email.FromAddress}</span>
+                                                            <lightning-icon icon-name="utility:forward" size="xx-small"
+                                                                            class="slds-m-horizontal_xx-small"></lightning-icon>
+                                                            <span style="color:blue">{email.ToAddress}</span>
+                                                        </p>
+                                                        <p>
+                                                            <lightning-formatted-date-time value={email.CreatedDate}
+                                                                                           year="numeric"
+                                                                                           month="numeric" day="numeric"
+                                                                                           hour="2-digit"
+                                                                                           minute="2-digit"
+                                                                                           time-zone-name="short"
+                                                                                           hour12={ampm}></lightning-formatted-date-time>
+                                                        </p>
+                                                    </div>
+
+                                                    <div class="slds-col slds-grow-none">
+
+                                                        <lightning-button-icon data-id={email.Id}
+                                                                               icon-name="utility:open"
+                                                                               class="slds-m-left_xx-small" title="Open"
+                                                                               onclick={handleOpen}
+                                                                               size="small"></lightning-button-icon>
+                                                    </div>
+                                                </div>
+
+                                                <div data-clampid={email.Id} class="slds-line-clamp_small">
+                                                    <div class="slds-text-align_left">
+
+                                                        <p><a data-objecttype="Email" data-caseid={caseItem.Id}
+                                                              data-auxid={email.Id} onclick={viewMore}>{email.viewStatus}</a>
+                                                        </p>
+                                                    </div>
+                                                    <p>
+                                                        <lightning-formatted-rich-text
+                                                                value={email.HtmlBody}></lightning-formatted-rich-text>
+
+                                                    </p>
+                                                </div>
+
+                                            </div>
+
+                                        </template>
+                                    </lightning-accordion-section>
+                                    <lightning-accordion-section name="Comments" label="Comments">
+                                        <template for:each={caseItem.lCaseComments} for:item="comment">
+                                            <div data-id={comment.Id} key={comment.Id} class="slds-p-vertical_x-small">
+                                                <div class="slds-grid">
+                                                    <div class="slds-col slds-grow-none">
+                                                        <lightning-icon icon-name="standard:note"
+                                                                        size="small"></lightning-icon>
+                                                    </div>
+                                                    <div class="slds-col">
+                                                        <p><span style="color:blue">{comment.CreatedBy.Name}</span> a
+                                                            las
+                                                            <lightning-formatted-date-time value={comment.CreatedDate}
+                                                                                           year="numeric"
+                                                                                           month="numeric" day="numeric"
+                                                                                           hour="2-digit"
+                                                                                           minute="2-digit"
+                                                                                           time-zone-name="short"
+                                                                                           hour12={ampm}></lightning-formatted-date-time>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div data-clampid={comment.Id} class="slds-line-clamp_small">
+                                                    <div class="slds-text-align_left">
+
+                                                        <p><a data-objecttype="Comment" data-caseid={caseItem.Id}
+                                                              data-auxid={comment.Id} onclick={viewMore}>{comment.viewStatus}</a>
+                                                        </p>
+                                                    </div>
+                                                    <p>
+                                                        <lightning-formatted-rich-text
+                                                                value={comment.CommentBody}></lightning-formatted-rich-text>
+
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </lightning-accordion-section>
+                                    <lightning-accordion-section name="FeedItems" label="FeedItems">
+                                        <template for:each={caseItem.lFeedItems} for:item="feeditem">
+                                            <div data-id={feeditem.Id} key={feeditem.Id}
+                                                 class="slds-p-vertical_x-small">
+                                                <div class="slds-grid">
+                                                    <div class="slds-col slds-grow-none">
+                                                        <lightning-icon icon-name="standard:feedback"
+                                                                        size="small"></lightning-icon>
+                                                    </div>
+                                                    <div class="slds-col">
+                                                        <p><span
+                                                                style="color:blue">{feeditem.feedItem.CreatedBy.Name}</span>
+                                                            a las
+                                                            <lightning-formatted-date-time
+                                                                    value={feeditem.feedItem.CreatedDate}
+                                                                    year="numeric"
+                                                                    month="numeric" day="numeric"
+                                                                    hour="2-digit"
+                                                                    minute="2-digit"
+                                                                    time-zone-name="short"
+                                                                    hour12={ampm}></lightning-formatted-date-time>
+                                                        </p>
+                                                    </div>
+                                                    <div class="slds-col slds-grow-none">
+
+                                                        <lightning-button-icon data-id={feeditem.Id}
+                                                                               icon-name="utility:open"
+                                                                               class="slds-m-left_xx-small" title="Open"
+                                                                               onclick={handleOpen}
+                                                                               size="small"></lightning-button-icon>
+                                                    </div>
+                                                </div>
+                                                <div data-clampid={feeditem.Id} class="slds-line-clamp_small">
+                                                    <div class="slds-text-align_left">
+
+                                                        <p><a data-objecttype="FeedItem" data-caseid={caseItem.Id}
+                                                              data-auxid={feeditem.Id} onclick={viewMore}>{feeditem.viewStatus}</a>
+                                                            (<span style="font-weight:bold">{feeditem.feedItem.CommentCount}</span>
+                                                            responses)
+                                                        </p>
+                                                    </div>
+                                                    <p>
+                                                        <lightning-formatted-rich-text
+                                                                value={feeditem.feedItem.Body}></lightning-formatted-rich-text>
+                                                    </p>
+
+                                                    <template for:each={feeditem.lFeedComments} for:item="feedcomment">
+                                                        <div key={feedcomment.Id}
+                                                             class="slds-m-left_small slds-m-top_small">
+                                                            <div class="slds-grid">
+                                                                <div class="slds-col slds-grow-none">
+                                                                    <lightning-icon icon-name="standard:live_chat"
+                                                                                    size="small"></lightning-icon>
+                                                                </div>
+                                                                <div class="slds-col">
+                                                                    <p><span style="color:blue">{feedcomment.CreatedBy.Name}</span>
+                                                                        a las
+                                                                        <lightning-formatted-date-time
+                                                                                value={feedcomment.CreatedDate}
+                                                                                year="numeric"
+                                                                                month="numeric" day="numeric"
+                                                                                hour="2-digit"
+                                                                                minute="2-digit"
+                                                                                time-zone-name="short"
+                                                                                hour12={ampm}></lightning-formatted-date-time>
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            <p>
+                                                                <lightning-formatted-rich-text
+                                                                        value={feedcomment.CommentBody}></lightning-formatted-rich-text>
+                                                            </p>
+                                                        </div>
+                                                    </template>
+
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </lightning-accordion-section>
+                                    <lightning-accordion-section name="Files" label="Files">
+                                        <template for:each={caseItem.lFiles} for:item="file">
+
+                                            <div data-id={file.Id} key={file.Id} class="slds-p-vertical_x-small">
+                                                <div class="slds-grid">
+                                                    <div class="slds-col slds-grow-none">
+                                                        <lightning-icon icon-name="standard:file"
+                                                                        size="small"></lightning-icon>
+                                                    </div>
+                                                    <div class="slds-col">
+                                                        <p><span style="color:blue;font-weight:bold; font-size:14px"><a
+                                                                data-id={file.ContentDocumentId} onclick={handleOpen}>{file.ContentDocument.Title}</a></span>
+                                                            a las
+                                                            <lightning-formatted-date-time
+                                                                    value={file.ContentDocument.CreatedDate}
+                                                                    year="numeric"
+                                                                    month="numeric" day="numeric"
+                                                                    hour="2-digit"
+                                                                    minute="2-digit"
+                                                                    time-zone-name="short"
+                                                                    hour12={ampm}></lightning-formatted-date-time>
+                                                        </p>
+                                                        <p>Tipo: <span style="font-weight:bold">{file.ContentDocument.FileType}</span>
+                                                        </p>
+                                                    </div>
+                                                    <div class="slds-col slds-grow-none">
+
+                                                        <lightning-button-icon data-id={file.ContentDocumentId}
+                                                                               icon-name="utility:open"
+                                                                               class="slds-m-left_xx-small" title="Open"
+                                                                               onclick={handleOpen}
+                                                                               size="small"></lightning-button-icon>
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <template for:each={caseItem.lArchivedFiles} for:item="archivedFile">
+
+                                            <div data-id={archivedFile.Id} key={archivedFile.Id}
+                                                 class="slds-p-vertical_x-small">
+                                                <div class="slds-grid">
+                                                    <div class="slds-col slds-grow-none">
+                                                        <lightning-icon icon-name="standard:file"
+                                                                        size="small"></lightning-icon>
+                                                    </div>
+                                                    <div class="slds-col">
+                                                        <p><span style="color:blue;font-weight:bold; font-size:14px">{archivedFile.ABA_FLD_MD_FileManager__r.ABA_FLD_T_FileName__c}</span>
+                                                            <span style="font-weight:bold"> (archivado)</span></p>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </lightning-accordion-section>
+
+                                </lightning-accordion>
+                            </lightning-accordion-section>
+                        </lightning-accordion>
+
+                    </lightning-card>
+
+                </template>
+            </template>
+        </div>
+
+
+    </lightning-card>
+
+</template>

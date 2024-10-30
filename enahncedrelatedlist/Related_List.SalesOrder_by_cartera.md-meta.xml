@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Sales Order by Cartera</label>
+    <protected>false</protected>
+    <values>
+        <field>Json_Config__c</field>
+        <value xsi:type="xsd:string">{
+	&quot;title&quot;: &quot;Cartera&quot;,
+	&quot;query&quot;: &quot;SELECT Name, URLLine__c, URLSaleOrderDelivery__c, NameLine__c, Company__c, SaleOrderDate__c, BlockedLoadList__c, PaymentCondition__c, PaymentMethod__c, EarlyPaymentDiscount__c, StatusSaleOrderDelivery__c   from SalesOrderDelivery__c where SalesOrderProduct__r.SalesOrder__r.Account__c = : recordId and StatusSaleOrderDelivery__c = &apos;1&apos;  ORDER BY SalesOrderProduct__r.SalesOrder__r.SalesOrderDate__c DESC&quot;,
+	&quot;iconName&quot;: &quot;standard:case&quot;,
+	&quot;datatableType&quot;: [
+                {&quot;label&quot;: &quot;Línea&quot;,&quot;fieldName&quot;: &quot;URLLine__c&quot;,&quot;type&quot;: &quot;url&quot;,&quot;hideDefaultActions&quot;: &quot;true&quot;,&quot;typeAttributes&quot;: {&quot;label&quot;: {&quot;fieldName&quot;: &quot;NameLine__c&quot;},&quot;target&quot;: &quot;_blank&quot;}},
+                {&quot;label&quot;: &quot;Entrega&quot;,&quot;fieldName&quot;: &quot;URLSaleOrderDelivery__c&quot;,&quot;type&quot;: &quot;url&quot;,&quot;hideDefaultActions&quot;: &quot;true&quot;,&quot;typeAttributes&quot;: {&quot;label&quot;: {&quot;fieldName&quot;: &quot;Name&quot;},&quot;target&quot;: &quot;_blank&quot;}},
+                {&quot;label&quot;: &quot;Empresa&quot;,&quot;fieldName&quot;: &quot;Company__c&quot;,&quot;type&quot;: &quot;text&quot;,&quot;hideDefaultActions&quot;: &quot;true&quot;},
+                {&quot;label&quot;: &quot;Fecha pedido&quot;,&quot;fieldName&quot;: &quot;SaleOrderDate__c&quot;,&quot;type&quot;: &quot;date&quot;},
+                {&quot;label&quot;: &quot;Dto. pronto pago&quot;,&quot;fieldName&quot;: &quot;EarlyPaymentDiscount__c&quot;,&quot;type&quot;: &quot;number&quot;,&quot;hideDefaultActions&quot;: &quot;true&quot;},
+                {&quot;label&quot;: &quot;Carga bloqueada&quot;,&quot;fieldName&quot;: &quot;BlockedLoadList__c&quot;,&quot;type&quot;: &quot;text&quot;,&quot;hideDefaultActions&quot;: &quot;true&quot;},
+                {&quot;label&quot;: &quot;Condición de pago&quot;,&quot;fieldName&quot;: &quot;PaymentCondition__c&quot;,&quot;type&quot;: &quot;text&quot;,&quot;hideDefaultActions&quot;: &quot;true&quot;},
+                {&quot;label&quot;: &quot;Método de pago&quot;,&quot;fieldName&quot;: &quot;PaymentMethod__c&quot;,&quot;type&quot;: &quot;text&quot;,&quot;hideDefaultActions&quot;: &quot;true&quot;},
+                {&quot;label&quot;: &quot;Estado entrega&quot;,&quot;fieldName&quot;: &quot;StatusSaleOrderDelivery__c&quot;,&quot;type&quot;: &quot;text&quot;,&quot;hideDefaultActions&quot;: &quot;true&quot;}
+                
+	]
+}</value>
+    </values>
+</CustomMetadata>

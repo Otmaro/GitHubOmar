@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Opportunities by hierarchy</label>
+    <protected>false</protected>
+    <values>
+        <field>Json_Config__c</field>
+        <value xsi:type="xsd:string">{
+	&quot;title&quot;: &quot;Oportunidades&quot;,
+	&quot;query&quot;: &quot;SELECT Id, Name , CreatedDate,CloseDate, StageName, Account.Name, URLOpportunity__c FROM Opportunity WHERE Account.ParentId = :recordId ORDER BY CreatedDate DESC&quot;,
+	&quot;iconName&quot;: &quot;standard:opportunity&quot;,
+	&quot;datatableType&quot;: [
+                {&quot;label&quot;: &quot;Oportunidad&quot;,&quot;fieldName&quot;: &quot;URLOpportunity__c&quot;,&quot;type&quot;: &quot;url&quot;,&quot;hideDefaultActions&quot;: &quot;true&quot;,&quot;typeAttributes&quot;: {&quot;label&quot;: {&quot;fieldName&quot;: &quot;Name&quot;},&quot;target&quot;: &quot;_blank&quot;}},
+		{&quot;label&quot;: &quot;Etapa&quot;,&quot;fieldName&quot;: &quot;StageName&quot;,&quot;type&quot;: &quot;Text&quot;},
+		{&quot;label&quot;: &quot;Fecha creacion&quot;,&quot;fieldName&quot;: &quot;CreatedDate&quot;,&quot;type&quot;: &quot;date&quot;},
+		{&quot;label&quot;: &quot;Fecha cierre&quot;,&quot;fieldName&quot;: &quot;CloseDate&quot;,&quot;type&quot;: &quot;date&quot;}
+	]
+}</value>
+    </values>
+</CustomMetadata>

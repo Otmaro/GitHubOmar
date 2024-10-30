@@ -1,0 +1,31 @@
+.field-title {
+    font-size: 1rem;
+    line-height: 1.25;
+    color: #54698d;
+    margin-bottom: .25rem;
+}
+
+.alertas-activas-container {
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    color: #595959;
+    margin-right: 0.5rem;
+}
+.alert-icon {
+    margin-right: 0.25rem;
+    color: #FFB75D;
+}
+.alertas-activas-text {
+    font-weight: bold;
+    color: #333;
+}
+.slds-badge.computado-badge {
+    background-color: #ffeb3b;
+    color: #4d4d4d;
+    margin-right: 1rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.25rem;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

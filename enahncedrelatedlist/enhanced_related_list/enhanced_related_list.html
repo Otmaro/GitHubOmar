@@ -1,0 +1,49 @@
+<!--
+  @description       : Componente capaz de mostrar listas relacionadas con información extraída de metadatos
+  @author            : Clarcat
+  @group             : 
+  @last modified on  : 11-30-2021
+  @last modified by  : Clarcat
+-->
+<template>
+    <div class="c-container">
+        <lightning-card class="slds-card_boundary" icon-name={iconName} title={title}>
+            <template if:true={showSpinner}>
+                <lightning-spinner alternative-text="Loading" variant="brand" size="medium"></lightning-spinner>
+            </template>
+            <div slot="actions">
+                <lightning-button-icon icon-name="utility:refresh" slot="actions" alternative-text="Actualizar"
+                    title="Actualizar" onclick={handleReload} class="slds-m-left_xx-small"> </lightning-button-icon>
+                <template if:true={attach}>
+                    <lightning-file-upload name="fileUploader" multiple="true"
+                        accept=".doc, .docx, .pdf, .png, .jpeg, .xls, .xlsx" record-id={recordId}
+                        onuploadfinished={handleUploadFinished}></lightning-file-upload>
+                </template>
+            </div>
+            <div slot="footer">
+                <template if:true={showAllLinks}>
+                    <a onclick={handleCountRecords}>{seeAllLabel}</a>
+                </template>
+            </div>
+                <template if:true={seeAll}>
+                    <p class="slds-p-horizontal_small">
+                        <lightning-datatable
+                            class="related-list slds-table slds-table_bordered slds-max-medium-table_stacked-horizontal"
+                            columns={datatableType} data={allRecords} key-field="id" hide-checkbox-column="true"
+                            resize-column-disabled="true" hide-default-actions="true" editable="true" onrowaction={handleRowAction}>
+                        </lightning-datatable>
+                    </p>
+                </template>
+                <template if:false={seeAll}>
+                    <p class="slds-p-horizontal_small">
+                        <lightning-datatable
+                            class="related-list slds-table slds-table_bordered slds-max-medium-table_stacked-horizontal"
+                            columns={datatableType} data={records} key-field="id" hide-checkbox-column="true"
+                            resize-column-disabled="true" hide-default-actions="true" editable="true" onrowaction={handleRowAction}>
+                        </lightning-datatable>
+                    </p>
+                </template>
+         
+        </lightning-card>
+    </div>
+</template>

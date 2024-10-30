@@ -1,0 +1,23 @@
+.no-wrap {
+    white-space: normal;
+}
+
+
+lightning-button-icon {
+        margin-left: 2px;
+        margin-right: 2px;
+    }
+lightning-icon {
+        margin-right: 4px;
+    }
+
+.slds-accordion__list-item {
+        border-top-style: none;
+    }
+
+p { white-space:pre;}
+
+.currency-text{
+        margin-left: auto;
+        margin-right: 0;
+    }
